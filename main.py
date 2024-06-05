@@ -29,7 +29,7 @@ layout = [
         sg.VSeparator(),
         sg.Column(
             [   
-                [sg.Text("", size=(80, 2))],
+                [sg.Text("", key="-DETAILSMOD-", size=(80, 2))],
                 [sg.Text("Imagen Modificada", size=(80, 2))],
                 [sg.Image(filename="", key="-IMAGE-MODIFIED-", size=(image_width, image_height))]
             ],
@@ -49,14 +49,16 @@ layout = [
             [   
             [sg.Text("Translación X:", size=(10, 1)), sg.InputText("0", key="-TRANSLATE-X-", size=(5, 1)),
             sg.Text("Translación Y:", size=(10, 1)), sg.InputText("0", key="-TRANSLATE-Y-", size=(5, 1)),
-            sg.Button("Aplicar Translación", size=(15, 1))],
+            sg.Button("Aplicar translación", size=(15, 1))],
             [sg.Text("Rotación:", size=(10, 1)), sg.InputText("0", key="-ROTATE-ANGLE-", size=(5, 1)),
-            sg.Button("Aplicar Rotación", size=(15, 1))]
+            sg.Button("Aplicar rotación", size=(15, 1))],
+            [sg.Text("Nueva altura:", size=(10, 1)), sg.InputText("0", key="-NEW-HEIGHT-", size=(5, 1)),
+            sg.Text("Nuevo ancho:", size=(10, 1)), sg.InputText("0", key="-NEW-WIDTH-", size=(5, 1)),
+            sg.Button("Aplicar tamaño", size=(15, 1))],
             ],
         )
     ]
 ]
-
 
 # Crea la ventana con el tamaño de la resolución de la pantalla del usuario
 window = sg.Window("PyPhotoEditor", layout, size=(screen_width, screen_height))
@@ -91,23 +93,30 @@ while True:
             
             # Mostrar la imagen modificada inicial (igual a la original)
             window["-IMAGE-MODIFIED-"].update(data=imgbytes)
-    elif event == "Aplicar Translación":
+    elif event == "Aplicar translación":
         if loaded_image is not None:
             try:
                 # Obtener valores de translación
                 translate_x = int(values["-TRANSLATE-X-"])
                 translate_y = int(values["-TRANSLATE-Y-"])
                 
-                # Aplicar la translación
-                modified_image = imutils.translate(loaded_image, translate_x, translate_y)
-                translated_image_resized = cv2.resize(modified_image, (image_width, image_height), interpolation=cv2.INTER_AREA)
-                imgbytes = cv2.imencode(".png", translated_image_resized)[1].tobytes()
+                # Aplicar la translación a la imagen original
+                modified_image = imutils.translate(modified_image, translate_x, translate_y)
                 
                 # Mostrar la imagen modificada
+                modified_image_resized = cv2.resize(modified_image, (image_width, image_height), interpolation=cv2.INTER_AREA)
+                imgbytes = cv2.imencode(".png", modified_image_resized)[1].tobytes()
+                
+                # Actualizar la ventana con la imagen modificada
                 window["-IMAGE-MODIFIED-"].update(data=imgbytes)
+                
+                # Actualizar los detalles de la imagen modificada
+                height, width, _ = modified_image.shape
+                details = f"Alto: {height}px, Ancho: {width}px"
+                window["-DETAILSMOD-"].update(details)
             except ValueError:
                 sg.popup("Por favor, ingrese valores válidos para la translación.")
-    elif event == "Aplicar Rotación":
+    elif event == "Aplicar rotación":
         if loaded_image is not None:
             try:
                 # Obtener el ángulo de rotación
@@ -120,15 +129,43 @@ while True:
                 # Obtener la matriz de rotación
                 M = cv2.getRotationMatrix2D(center, angle, 1.0)
                 
-                # Aplicar la rotación
-                modified_image = cv2.warpAffine(loaded_image, M, (w, h))
-                rotated_image_resized = cv2.resize(modified_image, (image_width, image_height), interpolation=cv2.INTER_AREA)
-                imgbytes = cv2.imencode(".png", rotated_image_resized)[1].tobytes()
+                # Aplicar la rotación a la imagen original
+                modified_image = cv2.warpAffine(modified_image, M, (w, h))
                 
                 # Mostrar la imagen modificada
+                modified_image_resized = cv2.resize(modified_image, (image_width, image_height), interpolation=cv2.INTER_AREA)
+                imgbytes = cv2.imencode(".png", modified_image_resized)[1].tobytes()
+                
+                # Actualizar la ventana con la imagen modificada
                 window["-IMAGE-MODIFIED-"].update(data=imgbytes)
+                
+                # Actualizar los detalles de la imagen modificada
+                height, width, _ = modified_image.shape
+                details = f"Alto: {height}px, Ancho: {width}px"
+                window["-DETAILSMOD-"].update(details)
             except ValueError:
-                sg.popup("Por favor, ingrese un valor válido para el ángulo de rotación.")
+                sg.popup("Por favor, ingrese valores válidos para la rotación.")
+    elif event == "Aplicar tamaño":
+        if loaded_image is not None:
+            try:
+                # Obtener los valores de ancho y alto especificados por el usuario
+                new_width = int(values["-NEW-WIDTH-"])
+                new_height = int(values["-NEW-HEIGHT-"])
+                
+                # Aplicar el cambio de tamaño a la imagen modificada
+                modified_image = cv2.resize(modified_image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+                
+                # Mostrar la imagen modificada
+                modified_image_resized = cv2.resize(modified_image, (image_width, image_height), interpolation=cv2.INTER_AREA)
+                imgbytes = cv2.imencode(".png", modified_image_resized)[1].tobytes()
+                window["-IMAGE-MODIFIED-"].update(data=imgbytes)
+                
+                # Actualizar los detalles de la imagen modificada
+                height, width, _ = modified_image.shape
+                details = f"Alto: {height}px, Ancho: {width}px"
+                window["-DETAILSMOD-"].update(details)
+            except ValueError:
+                sg.popup("Por favor, ingrese valores válidos para el ancho y el alto.")
     elif event == "Deshacer cambios":
         if loaded_image is not None:
             # Restaurar la imagen modificada a la original
@@ -143,6 +180,7 @@ while True:
                 # Guardar la imagen modificada
                 cv2.imwrite(save_filename, modified_image)
                 sg.popup("Imagen guardada con éxito.")
+    
 
 # Cierra la ventana
 window.close()
