@@ -37,15 +37,26 @@ layout = [
         )
     ],
     [
-        sg.Button("Cargar Imagen", size=(15, 1)), 
-        sg.Text("Translación X:", size=(10, 1)), sg.InputText("0", key="-TRANSLATE-X-", size=(5, 1)),
-        sg.Text("Translación Y:", size=(10, 1)), sg.InputText("0", key="-TRANSLATE-Y-", size=(5, 1)),
-        sg.Button("Aplicar Translación", size=(15, 1)),
-        sg.Button("Guardar imagen", size=(15, 1)),
-        sg.Button("Deshacer cambios", size=(15, 1)),
-        sg.Button("Salir", size=(15, 1))
+        sg.Column(
+            [   
+            [sg.Button("Cargar Imagen", size=(15, 1))], 
+            [sg.Button("Guardar imagen", size=(15, 1))],
+            [sg.Button("Deshacer cambios", size=(15, 1))],
+            [sg.Button("Salir", size=(15, 1))]
+            ],
+        ),
+        sg.Column(
+            [   
+            [sg.Text("Translación X:", size=(10, 1)), sg.InputText("0", key="-TRANSLATE-X-", size=(5, 1)),
+            sg.Text("Translación Y:", size=(10, 1)), sg.InputText("0", key="-TRANSLATE-Y-", size=(5, 1)),
+            sg.Button("Aplicar Translación", size=(15, 1))],
+            [sg.Text("Rotación:", size=(10, 1)), sg.InputText("0", key="-ROTATE-ANGLE-", size=(5, 1)),
+            sg.Button("Aplicar Rotación", size=(15, 1))]
+            ],
+        )
     ]
 ]
+
 
 # Crea la ventana con el tamaño de la resolución de la pantalla del usuario
 window = sg.Window("PyPhotoEditor", layout, size=(screen_width, screen_height))
@@ -96,6 +107,28 @@ while True:
                 window["-IMAGE-MODIFIED-"].update(data=imgbytes)
             except ValueError:
                 sg.popup("Por favor, ingrese valores válidos para la translación.")
+    elif event == "Aplicar Rotación":
+        if loaded_image is not None:
+            try:
+                # Obtener el ángulo de rotación
+                angle = int(values["-ROTATE-ANGLE-"])
+                
+                # Obtener el centro de la imagen
+                (h, w) = loaded_image.shape[:2]
+                center = (w // 2, h // 2)
+                
+                # Obtener la matriz de rotación
+                M = cv2.getRotationMatrix2D(center, angle, 1.0)
+                
+                # Aplicar la rotación
+                modified_image = cv2.warpAffine(loaded_image, M, (w, h))
+                rotated_image_resized = cv2.resize(modified_image, (image_width, image_height), interpolation=cv2.INTER_AREA)
+                imgbytes = cv2.imencode(".png", rotated_image_resized)[1].tobytes()
+                
+                # Mostrar la imagen modificada
+                window["-IMAGE-MODIFIED-"].update(data=imgbytes)
+            except ValueError:
+                sg.popup("Por favor, ingrese un valor válido para el ángulo de rotación.")
     elif event == "Deshacer cambios":
         if loaded_image is not None:
             # Restaurar la imagen modificada a la original
