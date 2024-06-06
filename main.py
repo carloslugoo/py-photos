@@ -48,15 +48,17 @@ layout = [
         sg.Column(
             [   
             [sg.Text("Translación X:", size=(10, 1)), sg.InputText("0", key="-TRANSLATE-X-", size=(5, 1)),
-            sg.Text("Translación Y:", size=(10, 1)), sg.InputText("0", key="-TRANSLATE-Y-", size=(5, 1)),
+            sg.Text("Translación Y:", size=(10, 1)), sg.InputText("0", key="-TRANSLATE-Y-", size=(5, 1)), 
             sg.Button("Aplicar translación", size=(15, 1))],
-            [sg.Text("Rotación:", size=(10, 1)), sg.InputText("0", key="-ROTATE-ANGLE-", size=(5, 1)),
+            [sg.Text("Rotación:", size=(10, 1)), sg.InputText("0", key="-ROTATE-ANGLE-", size=(5, 1)), 
             sg.Button("Aplicar rotación", size=(15, 1))],
             [sg.Text("Nueva altura:", size=(10, 1)), sg.InputText("0", key="-NEW-HEIGHT-", size=(5, 1)),
-            sg.Text("Nuevo ancho:", size=(10, 1)), sg.InputText("0", key="-NEW-WIDTH-", size=(5, 1)),
+            sg.Text("Nuevo ancho:", size=(10, 1)), sg.InputText("0", key="-NEW-WIDTH-", size=(5, 1)), 
             sg.Button("Aplicar tamaño", size=(15, 1))],
+            [sg.Button("Aplicar espejado", size=(15, 1))],
             ],
-        )
+            element_justification='right'
+        ),
     ]
 ]
 
@@ -166,6 +168,20 @@ while True:
                 window["-DETAILSMOD-"].update(details)
             except ValueError:
                 sg.popup("Por favor, ingrese valores válidos para el ancho y el alto.")
+    elif event == "Aplicar espejado":
+        if loaded_image is not None:
+            # Aplicar espejado horizontal a la imagen modificada
+            modified_image = cv2.flip(modified_image, 1)
+            
+            # Mostrar la imagen modificada
+            modified_image_resized = cv2.resize(modified_image, (image_width, image_height), interpolation=cv2.INTER_AREA)
+            imgbytes = cv2.imencode(".png", modified_image_resized)[1].tobytes()
+            window["-IMAGE-MODIFIED-"].update(data=imgbytes)
+            
+            # Actualizar los detalles de la imagen modificada
+            height, width, _ = modified_image.shape
+            details = f"Alto: {height}px, Ancho: {width}px"
+            window["-DETAILSMOD-"].update(details)
     elif event == "Deshacer cambios":
         if loaded_image is not None:
             # Restaurar la imagen modificada a la original
@@ -181,6 +197,5 @@ while True:
                 cv2.imwrite(save_filename, modified_image)
                 sg.popup("Imagen guardada con éxito.")
     
-
 # Cierra la ventana
 window.close()
