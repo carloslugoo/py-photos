@@ -56,6 +56,11 @@ layout = [
             sg.Text("Nuevo ancho:", size=(10, 1)), sg.InputText("0", key="-NEW-WIDTH-", size=(5, 1)), 
             sg.Button("Aplicar tamaño", size=(15, 1))],
             [sg.Button("Aplicar espejado", size=(15, 1))],
+            [sg.Text("Recorte X1:", size=(10, 1)), sg.InputText("0", key="-CROP-X1-", size=(5, 1)),
+            sg.Text("Y1:", size=(5, 1)), sg.InputText("0", key="-CROP-Y1-", size=(5, 1)),
+            sg.Text("X2:", size=(5, 1)), sg.InputText("0", key="-CROP-X2-", size=(5, 1)),
+            sg.Text("Y2:", size=(5, 1)), sg.InputText("0", key="-CROP-Y2-", size=(5, 1)),
+            sg.Button("Aplicar recorte", size=(15, 1))]
             ],
             element_justification='right'
         ),
@@ -182,6 +187,29 @@ while True:
             height, width, _ = modified_image.shape
             details = f"Alto: {height}px, Ancho: {width}px"
             window["-DETAILSMOD-"].update(details)
+    elif event == "Aplicar recorte":
+        if loaded_image is not None:
+            try:
+                # Obtener los valores de las coordenadas de recorte
+                x1 = int(values["-CROP-X1-"])
+                y1 = int(values["-CROP-Y1-"])
+                x2 = int(values["-CROP-X2-"])
+                y2 = int(values["-CROP-Y2-"])
+                
+                # Aplicar el recorte a la imagen modificada
+                modified_image = modified_image[y1:y2, x1:x2]
+                
+                # Mostrar la imagen modificada
+                modified_image_resized = cv2.resize(modified_image, (image_width, image_height), interpolation=cv2.INTER_AREA)
+                imgbytes = cv2.imencode(".png", modified_image_resized)[1].tobytes()
+                window["-IMAGE-MODIFIED-"].update(data=imgbytes)
+                
+                # Actualizar los detalles de la imagen modificada
+                height, width, _ = modified_image.shape
+                details = f"Alto: {height}px, Ancho: {width}px"
+                window["-DETAILSMOD-"].update(details)
+            except ValueError:
+                sg.popup("Por favor, ingrese valores válidos para el recorte.")
     elif event == "Deshacer cambios":
         if loaded_image is not None:
             # Restaurar la imagen modificada a la original
