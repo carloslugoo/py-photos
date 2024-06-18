@@ -7,7 +7,7 @@ OpenCV <br>
 ## Instalación
 Clone the project
 ```bash
-  git clone https://github.com/egemengulpinar/Car-Detection-Computer-Vision.git](https://github.com/carloslugoo/python-cv.git
+  git clone https://github.com/carloslugoo/python-cv.git
 ```
 Dependencias
 ```bash
