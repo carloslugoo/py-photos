@@ -12,11 +12,14 @@ Clone the project
 Dependencias
 ```bash
 pip install opencv-python
+pip install opencv-python PySimpleGUI==4.60.5
 ```
 ## Uso
-Puedes utilizar cualquier video con una cámara estable
+Puedes utilizar cualquier video con una cámara estable. <br>
+Ejecutar gui.py
 ```bash
-video_path = 'D:/Prog/py-photos/tracking/video1.mp4' 
+cd tracking
+python gui.py
 ```
 ## Resultados
 Selección de punto de intéres:
