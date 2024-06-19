@@ -1,6 +1,7 @@
 import PySimpleGUI as sg
 import cv2
-
+import tensorflow as tf
+import numpy as np
 sg.theme('Dark')  
 
 
@@ -147,7 +148,7 @@ while True:
             cap.release()
             cv2.destroyAllWindows()
     elif event == "Cargar imagen":
-        filename = sg.popup_get_file("Elija una imagen", file_types=(("Archivos JPEG", "*.jpeg"), ("Archivos JPG", "*.jpg")))
+        filename = sg.popup_get_file("Elija una imagen", file_types=(("Archivos JPG", "*.jpg"), ("Archivos JPEG", "*.jpeg")))
         if filename: 
             # Cargar la imagen
             image = cv2.imread(filename)
@@ -157,21 +158,40 @@ while True:
                 print("Error al cargar la imagen")
                 exit()
 
-            # Convertir la imagen a escala de grises
-            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            # Cargar el modelo
+            model = tf.saved_model.load('D:/Prog/py-photos/tracking/models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model')
 
-            # Cargar el clasificador en cascada de Haar para autos
-            car_cascade = cv2.CascadeClassifier('D:/Prog/py-photos/tracking/cars.xml')  
-            # Detectar autos en la imagen
-            cars = car_cascade.detectMultiScale(gray, 1.1, 1)
+            # Preparar la imagen para el modelo
+            input_tensor = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            input_tensor = tf.convert_to_tensor(input_tensor)
+            input_tensor = input_tensor[tf.newaxis, ...]
 
-            # Dibujar rectángulos alrededor de los autos detectados
-            for (x, y, w, h) in cars:
-                cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            # Realizar la detección
+            detections = model(input_tensor)
+
+            # Procesar las detecciones
+            num_detections = int(detections.pop('num_detections'))
+            detections = {key: value[0, :num_detections].numpy() for key, value in detections.items()}
+            detections['num_detections'] = num_detections
+
+            # Filtrar detecciones para la clase 'car'
+            category_index = {3: 'car'}  # 'car' es la clase 3 en el COCO dataset
+            detection_classes = detections['detection_classes'].astype(np.int64)
+            detection_boxes = detections['detection_boxes']
+            detection_scores = detections['detection_scores']
+
+            # Dibujar las cajas delimitadoras en la imagen
+            for i in range(num_detections):
+                if detection_classes[i] in category_index and detection_scores[i] > 0.5:
+                    box = detection_boxes[i]
+                    h, w, _ = image.shape
+                    y1, x1, y2, x2 = box
+                    x1, x2, y1, y2 = int(x1 * w), int(x2 * w), int(y1 * h), int(y2 * h)
+                    cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
             # Mostrar la imagen con las detecciones
             cv2.imshow('Detección de Vehículos', image)
 
-            # Esperar a que el usuario presione una tecla y cerrar la ventana
+            # Esperar a que el usuario presione una tecla y cerrar las ventanas
             cv2.waitKey(0)
             cv2.destroyAllWindows()
