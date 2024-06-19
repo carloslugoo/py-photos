@@ -161,7 +161,7 @@ while True:
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
             # Cargar el clasificador en cascada de Haar para autos
-            car_cascade = cv2.CascadeClassifier('D:/Prog/py-photos/tracking/cars.xml')  
+            car_cascade = cv2.CascadeClassifier('./tracking/cars.xml')  
             # Detectar autos en la imagen
             cars = car_cascade.detectMultiScale(gray, 1.1, 1)
 
