@@ -25,7 +25,7 @@ start_x, start_y = -1, -1
 end_x, end_y = -1, -1
 drawing = False
 rectangle_selected = False
-window_name = 'Selecciona el rectángulo'
+window_name = 'Selecciona el ROI'
 
 # Función para manejar la selección del usuario
 def draw_rectangle(event, x, y, flags, params):
