@@ -1,6 +1,7 @@
 ## Detección de Vehículos en Video con Python (OpenCV)
-Este proyecto utiliza OpenCV para detectar vehículos en movimiento en un video, excluyendo las luces de los autos en escenas nocturnas.
-El usuario puede seleccionar una región de interés (ROI) en el primer cuadro del video, y el programa realizará la detección de vehículos dentro de esta región. <br>
+Este proyecto utiliza OpenCV para detectar vehículos en movimiento en un video y tambien la detección de vehiculos en imagenes, excluyendo las luces de los autos en escenas nocturnas.
+En el caso del video, el usuario puede seleccionar una región de interés (ROI) en el primer cuadro del video, y el programa realizará la detección de vehículos dentro de esta región. 
+En caso de imagenes, solo es necesario cargar la imagen correspondiente.<br>
 ## Requisitos <br>
 Python 3.x <br>
 OpenCV <br>
