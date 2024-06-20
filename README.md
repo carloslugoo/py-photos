@@ -13,14 +13,21 @@ Clone the project
 Dependencias
 ```bash
 pip install opencv-python
-pip install opencv-python PySimpleGUI==4.60.5
+pip install PySimpleGUI==4.60.5
+pip install tensorflow #Solo GPU
 ```
 ## Uso
-Puedes utilizar cualquier video con una cámara estable. <br>
-Ejecutar gui.py
+Descarga el modelo ssd_mobilenet_v2 y sus archivos asociados desde [Tensorflow Detection Model Zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/tf2_detection_zoo.md) y colócalo en la carpeta models. En caso de disponer de GPU <br>
+Puedes utilizar cualquier video con una cámara estable. Ejemplos en el repositorio. <br>
+En caso de disponer de GPU - Ejecutar gui.py 
 ```bash
 cd tracking
 python gui.py
+```
+Sino:
+```bash
+cd tracking
+python gui-nogpu.py
 ```
 ## Resultados
 Selección de punto de intéres:
