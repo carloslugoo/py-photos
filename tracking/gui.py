@@ -159,8 +159,8 @@ while True:
                 exit()
 
             # Cargar el modelo
-            model = tf.saved_model.load('D:/Prog/py-photos/tracking/models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model')
-
+            model = tf.saved_model.load('models/ssd_mobilenet_v2_320x320_coco17_tpu-8/saved_model')
+            
             # Preparar la imagen para el modelo
             input_tensor = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             input_tensor = tf.convert_to_tensor(input_tensor)
@@ -190,7 +190,7 @@ while True:
                     cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
             # Mostrar la imagen con las detecciones
-            cv2.imshow('Detección de Vehículos', image)
+            cv2.imshow('Deteccion de Vehículos', image)
 
             # Esperar a que el usuario presione una tecla y cerrar las ventanas
             cv2.waitKey(0)
