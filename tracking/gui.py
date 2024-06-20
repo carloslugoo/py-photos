@@ -190,7 +190,7 @@ while True:
                     cv2.rectangle(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
             # Mostrar la imagen con las detecciones
-            cv2.imshow('Deteccion de Vehículos', image)
+            cv2.imshow('Deteccion de Vehiculos', image)
 
             # Esperar a que el usuario presione una tecla y cerrar las ventanas
             cv2.waitKey(0)
